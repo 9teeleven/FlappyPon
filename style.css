@@ -144,8 +144,9 @@ body {
 }
 
 #homeScreen {
-    background-image: url('assets/homebg.png');
+    background-image: assets/homebg.png;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
+
