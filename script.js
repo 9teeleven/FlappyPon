@@ -46,17 +46,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pengaturan Game
     let bird, pipes, score = 0, gameOver, gameLoopId, currentCorrectAnswer;
     let waitingForFirstFlap = true;
-    const gravity = 0.5;
-    const flapStrength = -8;
+    
+    // --- PERUBAHAN: Menyesuaikan konstanta untuk Delta Time ---
+    const gravity = 0.025;
+    const flapStrength = -0.45;
+    const pipeSpeed = 0.12;
+    // --- AKHIR PERUBAHAN ---
+
     let pipeWidth; 
     const pipeGap = 150;
-    const pipeSpeed = 2;
-    const pipeInterval = 120;
+    const pipeInterval = 120; // Ini tetap berbasis frame, bukan waktu
     let frameCount = 0;
     
     // Pengaturan Tanah
     let groundX = 0;
     const groundHeight = 112;
+
+    // --- PERUBAHAN: Variabel untuk Delta Time ---
+    let lastTime = 0;
 
     // BANK SOAL
     let questionBank = [
@@ -120,16 +127,21 @@ document.addEventListener('DOMContentLoaded', () => {
         waitingForFirstFlap = true;
         frameCount = 0;
         groundX = 0;
+        lastTime = 0; // Reset waktu terakhir
 
         if (gameLoopId) cancelAnimationFrame(gameLoopId);
-        gameLoop();
+        gameLoop(0); // Mulai loop dengan timestamp 0
 
         document.addEventListener('keydown', handleFlap);
         gameCanvas.addEventListener('mousedown', handleFlap);
+        gameCanvas.addEventListener('touchstart', handleFlap);
     }
 
     function handleFlap(e) {
-        if (e.code === 'Space' || e.type === 'mousedown') {
+        if (e.type === 'touchstart') {
+            e.preventDefault();
+        }
+        if (e.type === 'touchstart' || e.type === 'mousedown' || e.code === 'Space') {
             if (gameOver) return;
             if (waitingForFirstFlap) {
                 waitingForFirstFlap = false;
@@ -147,14 +159,24 @@ document.addEventListener('DOMContentLoaded', () => {
         pipes.push({ x: gameCanvas.width, topHeight: topPipeHeight, passed: false });
     }
 
-    function gameLoop() {
+    // --- PERUBAHAN: gameLoop sekarang menerima timestamp ---
+    function gameLoop(timestamp) {
         if (gameOver) return;
-        update();
+        
+        // Kalkulasi Delta Time
+        const deltaTime = timestamp - lastTime;
+        lastTime = timestamp;
+        
+        update(deltaTime);
         draw();
+        
         gameLoopId = requestAnimationFrame(gameLoop);
     }
 
-    function update() {
+    // --- PERUBAHAN: update sekarang menerima deltaTime ---
+    function update(deltaTime) {
+        if (!deltaTime || deltaTime > 100) return; // Abaikan frame jika tidak ada deltaTime atau terlalu besar
+
         bird.animationCounter++;
         if (bird.animationCounter >= bird.frameSpeed) {
             bird.animationCounter = 0;
@@ -163,10 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (waitingForFirstFlap) return;
 
-        bird.velocityY += gravity;
-        bird.y += bird.velocityY;
+        // Gunakan deltaTime untuk semua gerakan
+        bird.velocityY += gravity * deltaTime;
+        bird.y += bird.velocityY * deltaTime;
         
-        groundX -= pipeSpeed;
+        groundX -= pipeSpeed * deltaTime;
         if (groundX <= -gameCanvas.width) {
             groundX = 0;
         }
@@ -181,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         pipes.forEach(pipe => {
-            pipe.x -= pipeSpeed;
+            pipe.x -= pipeSpeed * deltaTime;
             const topPipeBottomY = pipe.topHeight;
             const bottomPipeTopY = pipe.topHeight + pipeGap;
 
@@ -204,15 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         ctx.drawImage(assets.background, 0, 0, gameCanvas.width, gameCanvas.height);
 
-        // --- PERBAIKAN: Logika baru untuk menggambar pipa ---
         pipes.forEach(pipe => {
             const topPipeSourceY = assets.pipeTop.height - pipe.topHeight;
             const bottomPipeHeight = gameCanvas.height - pipe.topHeight - pipeGap - groundHeight;
-
-            // Gambar pipa atas (mengambil potongan dari bawah gambar sumber)
             ctx.drawImage(assets.pipeTop, 0, topPipeSourceY, pipeWidth, pipe.topHeight, pipe.x, 0, pipeWidth, pipe.topHeight);
-            
-            // Gambar pipa bawah (mengambil potongan dari atas gambar sumber)
             ctx.drawImage(assets.pipeBottom, 0, 0, pipeWidth, bottomPipeHeight, pipe.x, pipe.topHeight + pipeGap, pipeWidth, bottomPipeHeight);
         });
         
@@ -222,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.save();
         ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
         if (!waitingForFirstFlap) {
-            ctx.rotate(Math.min(bird.velocityY / 20, Math.PI / 6));
+            ctx.rotate(Math.min(bird.velocityY * 20, Math.PI / 6)); // Dikalikan agar rotasi terlihat
         }
         const sourceX = bird.currentFrame * bird.frameWidth;
         ctx.drawImage(
@@ -240,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cancelAnimationFrame(gameLoopId);
         document.removeEventListener('keydown', handleFlap);
         gameCanvas.removeEventListener('mousedown', handleFlap);
+        gameCanvas.removeEventListener('touchstart', handleFlap);
         showMathQuiz();
     }
 
