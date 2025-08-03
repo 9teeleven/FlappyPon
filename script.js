@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pengaturan Game
     let bird, pipes, score = 0, gameOver, gameLoopId, currentCorrectAnswer;
     let waitingForFirstFlap = true;
-    const gravity = 0.5;
+    const gravity = 0.3;
     const flapStrength = -8;
     let pipeWidth; 
     const pipeGap = 150;
@@ -72,6 +72,19 @@ document.addEventListener('DOMContentLoaded', () => {
         { q: "Hasil dari <strong>(2 &times; 5)<sup>2</sup></strong> adalah...", o: [20, 100, 14, 49], a: 100 },
         { q: "Bilangan <strong>81</strong> jika diubah ke basis 3 adalah...", o: ["3<sup>3</sup>", "3<sup>5</sup>", "3<sup>4</sup>", "3<sup>9</sup>"], a: "3<sup>4</sup>" },
         { q: "Hasil dari <strong>1<sup>100</sup> + 100<sup>0</sup></strong> adalah...", o: [101, 1, 100, 2], a: 2 },
+        { q: "Hasil dari <strong>3<sup>3</sup></strong> adalah...", o: [9, 27, 18, 33], a: 27 },
+        { q: "Hasil dari <strong>(-2)<sup>3</sup></strong> adalah...", o: [8, -8, 6, -6], a: -8 },
+        { q: "Hasil dari <strong>(-3)<sup>4</sup></strong> adalah...", o: [-81, 12, 81, -12], a: 81 },
+        { q: "Bentuk sederhana dari <strong>(p<sup>2</sup>q<sup>3</sup>)<sup>2</sup></strong> adalah...", o: ["p<sup>4</sup>q<sup>5</sup>", "p<sup>2</sup>q<sup>6</sup>", "p<sup>4</sup>q<sup>6</sup>", "p<sup>4</sup>q<sup>9</sup>"], a: "p<sup>4</sup>q<sup>6</sup>" },
+        { q: "Bentuk sederhana dari <strong>a<sup>6</sup> &times; a</strong> adalah...", o: ["a<sup>6</sup>", "a<sup>7</sup>", "2a<sup>7</sup>", "a<sup>5</sup>"], a: "a<sup>7</sup>" },
+        { q: "Hasil dari <strong>5<sup>-1</sup></strong> adalah...", o: [-5, "1/5", 5, 0.5], a: "1/5" },
+        { q: "Bentuk sederhana dari <strong>(x<sup>10</sup>) &divide; (x<sup>5</sup>)</strong> adalah...", o: ["x<sup>2</sup>", "x<sup>15</sup>", "x<sup>5</sup>", "x<sup>50</sup>"], a: "x<sup>5</sup>" },
+        { q: "Hasil dari <strong>2<sup>2</sup> + 2<sup>3</sup></strong> adalah...", o: [10, 12, 32, 25], a: 12 },
+        { q: "Bilangan <strong>64</strong> jika diubah ke basis 4 adalah...", o: ["4<sup>2</sup>", "4<sup>4</sup>", "4<sup>3</sup>", "16<sup>2</sup>"], a: "4<sup>3</sup>" },
+        { q: "Bentuk sederhana dari <strong>(y<sup>3</sup>z)<sup>5</sup></strong> adalah...", o: ["y<sup>8</sup>z<sup>5</sup>", "y<sup>15</sup>z", "y<sup>15</sup>z<sup>5</sup>", "y<sup>3</sup>z<sup>5</sup>"], a: "y<sup>15</sup>z<sup>5</sup>" },
+        { q: "Hasil dari <strong>(1/2)<sup>3</sup></strong> adalah...", o: ["1/8", "1/6", "3/2", "3/8"], a: "1/8" },
+        { q: "Bentuk sederhana dari <strong>10<sup>0</sup> &times; 10<sup>5</sup></strong> adalah...", o: ["10<sup>0</sup>", "10<sup>5</sup>", "10<sup>6</sup>", "0"], a: "10<sup>5</sup>" },
+        { q: "Bentuk lain dari <strong>&#8730;9</strong> adalah...", o: ["9<sup>2</sup>", "9<sup>1/2</sup>", "9<sup>1</sup>", "3<sup>1/2</sup>"], a: "9<sup>1/2</sup>" }
     ];
     let shuffledQuestions = [];
     let currentQuestionIndex = 0;
@@ -285,3 +298,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startButton.addEventListener('click', () => startGame(false));
 });
+
