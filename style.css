@@ -1,0 +1,143 @@
+body {
+    margin: 0;
+    font-family: 'Press Start 2P', cursive;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    overflow: hidden;
+}
+
+.game-container {
+    position: relative;
+    width: 360px;
+    height: 640px;
+    border: 5px solid #333;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    background-color: #87CEEB;
+}
+
+#gameCanvas {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+#homeScreen, #loadingScreen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#loadingScreen { display: flex; }
+#homeScreen { display: none; }
+
+#homeScreen h1 {
+    font-size: 2.5em;
+    text-shadow: 3px 3px 0px #000;
+    margin-bottom: 20px;
+}
+
+#homeScreen p {
+    font-size: 0.9em;
+    line-height: 1.5;
+    margin-bottom: 40px;
+}
+
+.button, .option-button {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.2em;
+    padding: 15px 25px;
+    background-color: #FFD700;
+    color: #333;
+    border: 3px solid #333;
+    border-radius: 10px;
+    cursor: pointer;
+    text-shadow: 2px 2px 0px #fff;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+}
+
+.button:hover, .option-button:hover {
+    background-color: #FFA500;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+}
+
+#mathModal {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 100;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background-color: #4CAF50;
+    padding: 20px;
+    border-radius: 15px;
+    border: 5px solid #fff;
+    width: 90%;
+    max-width: 320px;
+}
+
+#question {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+#answerOptions {
+    display: flex;
+    flex-direction: column;
+}
+
+.option-button {
+    width: 100%;
+    font-size: 1em;
+    padding: 15px;
+}
+
+#scoreDisplay {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.5em;
+    z-index: 20;
+    text-shadow: 3px 3px 0px #000;
+}
+
+#startMessage {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    font-size: 1.2em;
+    text-shadow: 2px 2px 0 #000;
+    padding: 20px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 10px;
+}

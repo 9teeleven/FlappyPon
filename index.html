@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Pon</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div id="loadingScreen"><h2>Memuat Aset...</h2></div>
+        
+        <div id="homeScreen">
+            <h1>Flappy Pon</h1>
+            <p>Klik Spasi untuk terbang! Jawab soal eksponen jika gagal untuk melanjutkan skormu!</p>
+            <button id="startButton" class="button">Mulai</button>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="scoreDisplay" style="display: none;">0</div>
+        
+        <div id="startMessage">Klik Spasi untuk Mulai!</div>
+        
+        <div id="mathModal">
+            <div class="modal-content">
+                <h2>Tantangan Eksponen!</h2>
+                <div id="question"></div>
+                <div id="answerOptions"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
