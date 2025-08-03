@@ -10,25 +10,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const answerOptionsEl = document.getElementById('answerOptions');
     const startMessage = document.getElementById('startMessage');
     const ctx = gameCanvas.getContext('2d');
-
-    // Aset Gambar
+    
+    // Aset Gambar (Pastikan semua file ini ada di folder yang sama)
     const assets = {
         bird: new Image(), background: new Image(),
         pipeTop: new Image(), pipeBottom: new Image(),
         ground: new Image(),
     };
-    assets.bird.src = 'assets/bird.png';
+    assets.bird.src = 'assets/bird.png'; 
     assets.background.src = 'assets/background.png';
     assets.pipeTop.src = 'assets/pipe-top.png';
     assets.pipeBottom.src = 'assets/pipe-bottom.png';
     assets.ground.src = 'assets/tiles.png';
 
+    // Logika Pemuatan Aset
     let assetsLoaded = 0;
     const totalAssets = Object.keys(assets).length;
 
     function assetLoadedCallback(assetName, status) {
         if (status === 'error') {
-            console.error(`Gagal memuat aset: ${assetName}`);
+            console.error(`Gagal memuat aset: ${assetName} dari URL ${assets[assetName].src}. Pastikan file ada di folder yang sama dan nama file sudah benar.`);
         }
         assetsLoaded++;
         if (assetsLoaded === totalAssets) {
@@ -42,21 +43,22 @@ document.addEventListener('DOMContentLoaded', () => {
         assets[key].onerror = () => assetLoadedCallback(key, 'error');
     }
 
-    // Game Variables
+    // Pengaturan Game
     let bird, pipes, score = 0, gameOver, gameLoopId, currentCorrectAnswer;
     let waitingForFirstFlap = true;
-    const gravity = 800; // pixel/s²
-    const flapStrength = -300; // pixel/s
-    let pipeWidth;
+    const gravity = 0.5;
+    const flapStrength = -8;
+    let pipeWidth; 
     const pipeGap = 150;
-    const pipeSpeed = 120; // pixel/s
-    const pipeInterval = 1500; // ms
-    let timeSinceLastPipe = 0;
+    const pipeSpeed = 2;
+    const pipeInterval = 120;
+    let frameCount = 0;
+    
+    // Pengaturan Tanah
     let groundX = 0;
     const groundHeight = 112;
-    let lastTimestamp = 0;
 
-    // Bank Soal
+    // BANK SOAL
     let questionBank = [
         { q: "Hasil dari <strong>2<sup>4</sup></strong> adalah...", o: [8, 16, 6, 32], a: 16 },
         { q: "Hasil dari <strong>5<sup>3</sup></strong> adalah...", o: [15, 25, 125, 53], a: 125 },
@@ -86,9 +88,10 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCanvas.style.display = 'block';
         scoreDisplay.style.display = 'block';
         startMessage.style.display = 'block';
-
+        
         gameCanvas.width = 360;
         gameCanvas.height = 640;
+        
         pipeWidth = assets.pipeTop.width;
 
         if (!keepScore) {
@@ -101,23 +104,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         bird = {
             x: 60, y: 250,
-            width: 40, height: 40,
+            width: 40, height: 40,      
             velocityY: 0,
             sprite: assets.bird,
-            frameWidth: 16,
-            frameHeight: 16,
+            frameWidth: 16,             
+            frameHeight: 16,            
             frameCount: 4,
             currentFrame: 0,
             animationCounter: 0,
-            frameSpeed: 6
+            frameSpeed: 6               
         };
 
         pipes = [];
         gameOver = false;
         waitingForFirstFlap = true;
-        timeSinceLastPipe = 0;
+        frameCount = 0;
         groundX = 0;
-        lastTimestamp = 0;
 
         if (gameLoopId) cancelAnimationFrame(gameLoopId);
         gameLoop();
@@ -137,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bird.velocityY = flapStrength;
         }
     }
-
+    
     function addPipe() {
         const minHeight = 80;
         const maxHeight = gameCanvas.height - pipeGap - groundHeight - minHeight;
@@ -145,19 +147,14 @@ document.addEventListener('DOMContentLoaded', () => {
         pipes.push({ x: gameCanvas.width, topHeight: topPipeHeight, passed: false });
     }
 
-    function gameLoop(timestamp) {
+    function gameLoop() {
         if (gameOver) return;
-
-        if (!lastTimestamp) lastTimestamp = timestamp;
-        const deltaTime = (timestamp - lastTimestamp) / 1000;
-        lastTimestamp = timestamp;
-
-        update(deltaTime);
+        update();
         draw();
         gameLoopId = requestAnimationFrame(gameLoop);
     }
 
-    function update(deltaTime) {
+    function update() {
         bird.animationCounter++;
         if (bird.animationCounter >= bird.frameSpeed) {
             bird.animationCounter = 0;
@@ -166,10 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (waitingForFirstFlap) return;
 
-        bird.velocityY += gravity * deltaTime;
-        bird.y += bird.velocityY * deltaTime;
-
-        groundX -= pipeSpeed * deltaTime;
+        bird.velocityY += gravity;
+        bird.y += bird.velocityY;
+        
+        groundX -= pipeSpeed;
         if (groundX <= -gameCanvas.width) {
             groundX = 0;
         }
@@ -178,15 +175,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return endGame();
         }
 
-        timeSinceLastPipe += deltaTime * 1000;
-        if (timeSinceLastPipe >= pipeInterval) {
+        frameCount++;
+        if (frameCount % pipeInterval === 0) {
             addPipe();
-            timeSinceLastPipe = 0;
         }
 
         pipes.forEach(pipe => {
-            pipe.x -= pipeSpeed * deltaTime;
-
+            pipe.x -= pipeSpeed;
             const topPipeBottomY = pipe.topHeight;
             const bottomPipeTopY = pipe.topHeight + pipeGap;
 
@@ -206,21 +201,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function draw() {
         ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+        
         ctx.drawImage(assets.background, 0, 0, gameCanvas.width, gameCanvas.height);
 
+        // --- PERBAIKAN: Logika baru untuk menggambar pipa ---
         pipes.forEach(pipe => {
+            const topPipeSourceY = assets.pipeTop.height - pipe.topHeight;
             const bottomPipeHeight = gameCanvas.height - pipe.topHeight - pipeGap - groundHeight;
-            ctx.drawImage(assets.pipeTop, 0, assets.pipeTop.height - pipe.topHeight, pipeWidth, pipe.topHeight, pipe.x, 0, pipeWidth, pipe.topHeight);
+
+            // Gambar pipa atas (mengambil potongan dari bawah gambar sumber)
+            ctx.drawImage(assets.pipeTop, 0, topPipeSourceY, pipeWidth, pipe.topHeight, pipe.x, 0, pipeWidth, pipe.topHeight);
+            
+            // Gambar pipa bawah (mengambil potongan dari atas gambar sumber)
             ctx.drawImage(assets.pipeBottom, 0, 0, pipeWidth, bottomPipeHeight, pipe.x, pipe.topHeight + pipeGap, pipeWidth, bottomPipeHeight);
         });
-
+        
         ctx.drawImage(assets.ground, groundX, gameCanvas.height - groundHeight, gameCanvas.width, groundHeight);
         ctx.drawImage(assets.ground, groundX + gameCanvas.width, gameCanvas.height - groundHeight, gameCanvas.width, groundHeight);
 
         ctx.save();
         ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
         if (!waitingForFirstFlap) {
-            ctx.rotate(Math.min(bird.velocityY / 300, Math.PI / 6));
+            ctx.rotate(Math.min(bird.velocityY / 20, Math.PI / 6));
         }
         const sourceX = bird.currentFrame * bird.frameWidth;
         ctx.drawImage(
@@ -232,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         ctx.restore();
     }
-
+    
     function endGame() {
         gameOver = true;
         cancelAnimationFrame(gameLoopId);
