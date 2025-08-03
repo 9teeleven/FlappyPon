@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pengaturan Game
     let bird, pipes, score = 0, gameOver, gameLoopId, currentCorrectAnswer;
     let waitingForFirstFlap = true;
-    const gravity = 0.3;
+    const gravity = 0.5;
     const flapStrength = -8;
     let pipeWidth; 
     const pipeGap = 150;
@@ -298,4 +298,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startButton.addEventListener('click', () => startGame(false));
 });
+
 
