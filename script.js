@@ -10,26 +10,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const answerOptionsEl = document.getElementById('answerOptions');
     const startMessage = document.getElementById('startMessage');
     const ctx = gameCanvas.getContext('2d');
-    
-    // Aset Gambar (Pastikan semua file ini ada di folder yang sama)
+
+    // Aset Gambar
     const assets = {
         bird: new Image(), background: new Image(),
         pipeTop: new Image(), pipeBottom: new Image(),
         ground: new Image(),
     };
-    assets.bird.src = 'assets/bird.png'; 
+    assets.bird.src = 'assets/bird.png';
     assets.background.src = 'assets/background.png';
     assets.pipeTop.src = 'assets/pipe-top.png';
     assets.pipeBottom.src = 'assets/pipe-bottom.png';
     assets.ground.src = 'assets/tiles.png';
 
-    // Logika Pemuatan Aset
     let assetsLoaded = 0;
     const totalAssets = Object.keys(assets).length;
 
     function assetLoadedCallback(assetName, status) {
         if (status === 'error') {
-            console.error(`Gagal memuat aset: ${assetName} dari URL ${assets[assetName].src}. Pastikan file ada di folder yang sama dan nama file sudah benar.`);
+            console.error(`Gagal memuat aset: ${assetName}`);
         }
         assetsLoaded++;
         if (assetsLoaded === totalAssets) {
@@ -43,29 +42,21 @@ document.addEventListener('DOMContentLoaded', () => {
         assets[key].onerror = () => assetLoadedCallback(key, 'error');
     }
 
-    // Pengaturan Game
+    // Game Variables
     let bird, pipes, score = 0, gameOver, gameLoopId, currentCorrectAnswer;
     let waitingForFirstFlap = true;
-    
-    // --- PERUBAHAN: Menyesuaikan konstanta untuk Delta Time ---
-    const gravity = 0.025;
-    const flapStrength = -0.45;
-    const pipeSpeed = 0.12;
-    // --- AKHIR PERUBAHAN ---
-
-    let pipeWidth; 
+    const gravity = 800; // pixel/s²
+    const flapStrength = -300; // pixel/s
+    let pipeWidth;
     const pipeGap = 150;
-    const pipeInterval = 120; // Ini tetap berbasis frame, bukan waktu
-    let frameCount = 0;
-    
-    // Pengaturan Tanah
+    const pipeSpeed = 120; // pixel/s
+    const pipeInterval = 1500; // ms
+    let timeSinceLastPipe = 0;
     let groundX = 0;
     const groundHeight = 112;
+    let lastTimestamp = 0;
 
-    // --- PERUBAHAN: Variabel untuk Delta Time ---
-    let lastTime = 0;
-
-    // BANK SOAL
+    // Bank Soal
     let questionBank = [
         { q: "Hasil dari <strong>2<sup>4</sup></strong> adalah...", o: [8, 16, 6, 32], a: 16 },
         { q: "Hasil dari <strong>5<sup>3</sup></strong> adalah...", o: [15, 25, 125, 53], a: 125 },
@@ -95,10 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCanvas.style.display = 'block';
         scoreDisplay.style.display = 'block';
         startMessage.style.display = 'block';
-        
+
         gameCanvas.width = 360;
         gameCanvas.height = 640;
-        
         pipeWidth = assets.pipeTop.width;
 
         if (!keepScore) {
@@ -111,37 +101,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         bird = {
             x: 60, y: 250,
-            width: 40, height: 40,      
+            width: 40, height: 40,
             velocityY: 0,
             sprite: assets.bird,
-            frameWidth: 16,             
-            frameHeight: 16,            
+            frameWidth: 16,
+            frameHeight: 16,
             frameCount: 4,
             currentFrame: 0,
             animationCounter: 0,
-            frameSpeed: 6               
+            frameSpeed: 6
         };
 
         pipes = [];
         gameOver = false;
         waitingForFirstFlap = true;
-        frameCount = 0;
+        timeSinceLastPipe = 0;
         groundX = 0;
-        lastTime = 0; // Reset waktu terakhir
+        lastTimestamp = 0;
 
         if (gameLoopId) cancelAnimationFrame(gameLoopId);
-        gameLoop(0); // Mulai loop dengan timestamp 0
+        gameLoop();
 
         document.addEventListener('keydown', handleFlap);
         gameCanvas.addEventListener('mousedown', handleFlap);
-        gameCanvas.addEventListener('touchstart', handleFlap);
     }
 
     function handleFlap(e) {
-        if (e.type === 'touchstart') {
-            e.preventDefault();
-        }
-        if (e.type === 'touchstart' || e.type === 'mousedown' || e.code === 'Space') {
+        if (e.code === 'Space' || e.type === 'mousedown') {
             if (gameOver) return;
             if (waitingForFirstFlap) {
                 waitingForFirstFlap = false;
@@ -151,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bird.velocityY = flapStrength;
         }
     }
-    
+
     function addPipe() {
         const minHeight = 80;
         const maxHeight = gameCanvas.height - pipeGap - groundHeight - minHeight;
@@ -159,24 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
         pipes.push({ x: gameCanvas.width, topHeight: topPipeHeight, passed: false });
     }
 
-    // --- PERUBAHAN: gameLoop sekarang menerima timestamp ---
     function gameLoop(timestamp) {
         if (gameOver) return;
-        
-        // Kalkulasi Delta Time
-        const deltaTime = timestamp - lastTime;
-        lastTime = timestamp;
-        
+
+        if (!lastTimestamp) lastTimestamp = timestamp;
+        const deltaTime = (timestamp - lastTimestamp) / 1000;
+        lastTimestamp = timestamp;
+
         update(deltaTime);
         draw();
-        
         gameLoopId = requestAnimationFrame(gameLoop);
     }
 
-    // --- PERUBAHAN: update sekarang menerima deltaTime ---
     function update(deltaTime) {
-        if (!deltaTime || deltaTime > 100) return; // Abaikan frame jika tidak ada deltaTime atau terlalu besar
-
         bird.animationCounter++;
         if (bird.animationCounter >= bird.frameSpeed) {
             bird.animationCounter = 0;
@@ -185,10 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (waitingForFirstFlap) return;
 
-        // Gunakan deltaTime untuk semua gerakan
         bird.velocityY += gravity * deltaTime;
         bird.y += bird.velocityY * deltaTime;
-        
+
         groundX -= pipeSpeed * deltaTime;
         if (groundX <= -gameCanvas.width) {
             groundX = 0;
@@ -198,13 +178,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return endGame();
         }
 
-        frameCount++;
-        if (frameCount % pipeInterval === 0) {
+        timeSinceLastPipe += deltaTime * 1000;
+        if (timeSinceLastPipe >= pipeInterval) {
             addPipe();
+            timeSinceLastPipe = 0;
         }
 
         pipes.forEach(pipe => {
             pipe.x -= pipeSpeed * deltaTime;
+
             const topPipeBottomY = pipe.topHeight;
             const bottomPipeTopY = pipe.topHeight + pipeGap;
 
@@ -224,23 +206,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function draw() {
         ctx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
-        
         ctx.drawImage(assets.background, 0, 0, gameCanvas.width, gameCanvas.height);
 
         pipes.forEach(pipe => {
-            const topPipeSourceY = assets.pipeTop.height - pipe.topHeight;
             const bottomPipeHeight = gameCanvas.height - pipe.topHeight - pipeGap - groundHeight;
-            ctx.drawImage(assets.pipeTop, 0, topPipeSourceY, pipeWidth, pipe.topHeight, pipe.x, 0, pipeWidth, pipe.topHeight);
+            ctx.drawImage(assets.pipeTop, 0, assets.pipeTop.height - pipe.topHeight, pipeWidth, pipe.topHeight, pipe.x, 0, pipeWidth, pipe.topHeight);
             ctx.drawImage(assets.pipeBottom, 0, 0, pipeWidth, bottomPipeHeight, pipe.x, pipe.topHeight + pipeGap, pipeWidth, bottomPipeHeight);
         });
-        
+
         ctx.drawImage(assets.ground, groundX, gameCanvas.height - groundHeight, gameCanvas.width, groundHeight);
         ctx.drawImage(assets.ground, groundX + gameCanvas.width, gameCanvas.height - groundHeight, gameCanvas.width, groundHeight);
 
         ctx.save();
         ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
         if (!waitingForFirstFlap) {
-            ctx.rotate(Math.min(bird.velocityY * 20, Math.PI / 6)); // Dikalikan agar rotasi terlihat
+            ctx.rotate(Math.min(bird.velocityY / 300, Math.PI / 6));
         }
         const sourceX = bird.currentFrame * bird.frameWidth;
         ctx.drawImage(
@@ -252,13 +232,12 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         ctx.restore();
     }
-    
+
     function endGame() {
         gameOver = true;
         cancelAnimationFrame(gameLoopId);
         document.removeEventListener('keydown', handleFlap);
         gameCanvas.removeEventListener('mousedown', handleFlap);
-        gameCanvas.removeEventListener('touchstart', handleFlap);
         showMathQuiz();
     }
 
