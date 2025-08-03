@@ -60,21 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // BANK SOAL
     let questionBank = [
-        { q: "Hasil dari <strong>2<sup>4</sup></strong> adalah...", o: [8, 16, 6, 32], a: 16 },
         { q: "Hasil dari <strong>5<sup>3</sup></strong> adalah...", o: [15, 25, 125, 53], a: 125 },
         { q: "Hasil dari <strong>10<sup>3</sup></strong> adalah...", o: [30, 100, 300, 1000], a: 1000 },
-        { q: "Bentuk sederhana dari <strong>3<sup>2</sup> &times; 3<sup>4</sup></strong> adalah...", o: ["3<sup>6</sup>", "3<sup>8</sup>", "9<sup>6</sup>", "9<sup>8</sup>"], a: "3<sup>6</sup>" },
-        { q: "Bentuk sederhana dari <strong>7<sup>5</sup> &times; 7<sup>2</sup></strong> adalah...", o: ["7<sup>10</sup>", "49<sup>7</sup>", "7<sup>3</sup>", "7<sup>7</sup>"], a: "7<sup>7</sup>" },
-        { q: "Bentuk sederhana dari <strong>4<sup>8</sup> &divide; 4<sup>5</sup></strong> adalah...", o: ["4<sup>13</sup>", "1<sup>3</sup>", "4<sup>3</sup>", "4<sup>40</sup>"], a: "4<sup>3</sup>" },
-        { q: "Bentuk sederhana dari <strong>9<sup>7</sup> &divide; 9<sup>3</sup></strong> adalah...", o: ["9<sup>4</sup>", "9<sup>10</sup>", "1<sup>4</sup>", "9<sup>21</sup>"], a: "9<sup>4</sup>" },
         { q: "Bentuk sederhana dari <strong>(2<sup>3</sup>)<sup>4</sup></strong> adalah...", o: ["2<sup>7</sup>", "2<sup>81</sup>", "8<sup>4</sup>", "2<sup>12</sup>"], a: "2<sup>12</sup>" },
         { q: "Bentuk sederhana dari <strong>(6<sup>5</sup>)<sup>3</sup></strong> adalah...", o: ["6<sup>8</sup>", "6<sup>15</sup>", "6<sup>125</sup>", "30<sup>3</sup>"], a: "6<sup>15</sup>" },
         { q: "Hasil dari <strong>(2 &times; 5)<sup>2</sup></strong> adalah...", o: [20, 100, 14, 49], a: 100 },
         { q: "Bilangan <strong>81</strong> jika diubah ke basis 3 adalah...", o: ["3<sup>3</sup>", "3<sup>5</sup>", "3<sup>4</sup>", "3<sup>9</sup>"], a: "3<sup>4</sup>" },
         { q: "Hasil dari <strong>1<sup>100</sup> + 100<sup>0</sup></strong> adalah...", o: [101, 1, 100, 2], a: 2 },
         { q: "Hasil dari <strong>3<sup>3</sup></strong> adalah...", o: [9, 27, 18, 33], a: 27 },
-        { q: "Hasil dari <strong>(-2)<sup>3</sup></strong> adalah...", o: [8, -8, 6, -6], a: -8 },
-        { q: "Hasil dari <strong>(-3)<sup>4</sup></strong> adalah...", o: [-81, 12, 81, -12], a: 81 },
         { q: "Bentuk sederhana dari <strong>(p<sup>2</sup>q<sup>3</sup>)<sup>2</sup></strong> adalah...", o: ["p<sup>4</sup>q<sup>5</sup>", "p<sup>2</sup>q<sup>6</sup>", "p<sup>4</sup>q<sup>6</sup>", "p<sup>4</sup>q<sup>9</sup>"], a: "p<sup>4</sup>q<sup>6</sup>" },
         { q: "Bentuk sederhana dari <strong>a<sup>6</sup> &times; a</strong> adalah...", o: ["a<sup>6</sup>", "a<sup>7</sup>", "2a<sup>7</sup>", "a<sup>5</sup>"], a: "a<sup>7</sup>" },
         { q: "Hasil dari <strong>5<sup>-1</sup></strong> adalah...", o: [-5, "1/5", 5, 0.5], a: "1/5" },
@@ -83,8 +76,14 @@ document.addEventListener('DOMContentLoaded', () => {
         { q: "Bilangan <strong>64</strong> jika diubah ke basis 4 adalah...", o: ["4<sup>2</sup>", "4<sup>4</sup>", "4<sup>3</sup>", "16<sup>2</sup>"], a: "4<sup>3</sup>" },
         { q: "Bentuk sederhana dari <strong>(y<sup>3</sup>z)<sup>5</sup></strong> adalah...", o: ["y<sup>8</sup>z<sup>5</sup>", "y<sup>15</sup>z", "y<sup>15</sup>z<sup>5</sup>", "y<sup>3</sup>z<sup>5</sup>"], a: "y<sup>15</sup>z<sup>5</sup>" },
         { q: "Hasil dari <strong>(1/2)<sup>3</sup></strong> adalah...", o: ["1/8", "1/6", "3/2", "3/8"], a: "1/8" },
-        { q: "Bentuk sederhana dari <strong>10<sup>0</sup> &times; 10<sup>5</sup></strong> adalah...", o: ["10<sup>0</sup>", "10<sup>5</sup>", "10<sup>6</sup>", "0"], a: "10<sup>5</sup>" },
-        { q: "Bentuk lain dari <strong>&#8730;9</strong> adalah...", o: ["9<sup>2</sup>", "9<sup>1/2</sup>", "9<sup>1</sup>", "3<sup>1/2</sup>"], a: "9<sup>1/2</sup>" }
+        { q: "Bentuk sederhana dari <strong>√49</strong> adalah...", o: [6, 8, 7, 9], a: 7 },
+        { q: "Bentuk lain dari <strong>√25</strong> adalah...", o: [4, 3, 5, 2], a: 5 },
+        { q: "Bentuk sederhana dari <strong>√(4 × 9)</strong> adalah...", o: [6, 36, 12, 13], a: 6 },
+        { q: "Hasil dari <strong>√64 + √36</strong> adalah...", o: [14, 16, 12, 10], a: 14 },
+        { q: "Hasil dari <strong>√81 - √16</strong> adalah...", o: [7, 5, 9, 4], a: 5 },
+        { q: "Hasil dari <strong>√49 × √4</strong> adalah...", o: [14, 28, 8, 7], a: 14 },
+        { q: "Hasil dari <strong>√100 ÷ √25</strong> adalah...", o: [2, 4, 5, 10], a: 2 },
+        { q: "Hasil dari <strong>2√9 + 3√4</strong> adalah...", o: [18, 12, 13, 15], a: 12 },
     ];
     let shuffledQuestions = [];
     let currentQuestionIndex = 0;
@@ -298,5 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startButton.addEventListener('click', () => startGame(false));
 });
+
 
 
